@@ -690,9 +690,9 @@ resizeCanvases();
 const SFX = (() => {
   let ctx = null;
 
-  function getCtx() {
+  async function getCtx() {
     if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state === 'suspended') await ctx.resume();
     return ctx;
   }
 
@@ -726,8 +726,8 @@ const SFX = (() => {
   }
 
   // ── Drag tick: subtle click while moving the arm ──
-  function tick() {
-    const ac = getCtx();
+  async function tick() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.06, now, 0.03);
     g.connect(ac.destination);
@@ -741,8 +741,8 @@ const SFX = (() => {
   }
 
   // ── Grab: low thunk when user clicks the handle ──
-  function grab() {
-    const ac = getCtx();
+  async function grab() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.18, now, 0.08);
     g.connect(ac.destination);
@@ -750,8 +750,8 @@ const SFX = (() => {
   }
 
   // ── Release: soft click on mouseup ──
-  function release() {
-    const ac = getCtx();
+  async function release() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.10, now, 0.06);
     g.connect(ac.destination);
@@ -759,8 +759,8 @@ const SFX = (() => {
   }
 
   // ── Submit: rising chime ──
-  function submit() {
-    const ac = getCtx();
+  async function submit() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.22, now, 0.18);
     g.connect(ac.destination);
@@ -768,8 +768,8 @@ const SFX = (() => {
   }
 
   // ── Perfect (3 pts): bright tri-tone chord ──
-  function perfect() {
-    const ac = getCtx();
+  async function perfect() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     [523.25, 659.25, 783.99].forEach((freq, i) => {
       const g = gain(ac, 0.18, now + i * 0.06, 0.5);
@@ -794,8 +794,8 @@ const SFX = (() => {
   }
 
   // ── Close (2 pts): warm two-note chime ──
-  function close() {
-    const ac = getCtx();
+  async function close() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     [440, 554.37].forEach((freq, i) => {
       const g = gain(ac, 0.16, now + i * 0.07, 0.45);
@@ -805,8 +805,8 @@ const SFX = (() => {
   }
 
   // ── Almost (1 pt): single mid tone with slight bend ──
-  function almost() {
-    const ac = getCtx();
+  async function almost() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.18, now, 0.35);
     g.connect(ac.destination);
@@ -814,8 +814,8 @@ const SFX = (() => {
   }
 
   // ── Miss (0 pts): descending buzz ──
-  function miss() {
-    const ac = getCtx();
+  async function miss() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.15, now, 0.3);
     g.connect(ac.destination);
@@ -826,8 +826,8 @@ const SFX = (() => {
   }
 
   // ── Skip: short neutral blip ──
-  function skip() {
-    const ac = getCtx();
+  async function skip() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const g = gain(ac, 0.10, now, 0.12);
     g.connect(ac.destination);
@@ -835,8 +835,8 @@ const SFX = (() => {
   }
 
   // ── New round whoosh: arm swipe sound ──
-  function whoosh() {
-    const ac = getCtx();
+  async function whoosh() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     const buf = ac.createBuffer(1, ac.sampleRate * 0.25, ac.sampleRate);
     const data = buf.getChannelData(0);
@@ -854,8 +854,8 @@ const SFX = (() => {
   }
 
   // ── Game over fanfare ──
-  function gameOver() {
-    const ac = getCtx();
+  async function gameOver() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     // Descending sad phrase
     const notes = [392, 349.23, 329.63, 261.63];
@@ -868,8 +868,8 @@ const SFX = (() => {
   }
 
   // ── Start game: upbeat beep ──
-  function start() {
-    const ac = getCtx();
+  async function start() {
+    const ac = await getCtx();
     const now = ac.currentTime;
     [330, 440, 523.25].forEach((freq, i) => {
       const t = now + i * 0.1;
