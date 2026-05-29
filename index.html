@@ -8,59 +8,39 @@
 <style>
   :root {
     --bg: #0d0d0d;
-    --panel: #111;
     --border: #2a2a2a;
     --accent: #e8c547;
     --accent2: #4ec9b0;
+    --accent3: #c084fc;
     --dim: #555;
     --text: #e0e0e0;
     --correct: #4ec9b0;
-    --close: #e8c547;
     --off: #e05c5c;
     --grid: rgba(255,255,255,0.03);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    height: 100%;
-  }
+  html, body { height: 100%; }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     font-family: 'Courier Prime', monospace;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    user-select: none;
+    height: 100vh; display: flex; flex-direction: column;
+    overflow: hidden; user-select: none;
   }
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
+
+  /* ── SHARED HEADER / FOOTER ── */
   header {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 24px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 24px; border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
   }
-  .title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 4px;
-    color: var(--accent);
-  }
+  .title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--accent); cursor: pointer; }
+  .title:hover { opacity: 0.8; }
   .score-bar { display: flex; gap: 32px; align-items: center; }
   .score-block { text-align: center; line-height: 1.1; }
   .score-label { font-size: 10px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
@@ -73,22 +53,11 @@
   .panel-left { border-right: 1px solid var(--border); }
   .panel-label { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; white-space: nowrap; }
   canvas { display: block; cursor: default; }
-  #canvas-right { cursor: crosshair; }
-  #canvas-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 50;
-    display: none;
-  }
   footer {
     position: relative; z-index: 10;
     display: flex; align-items: center; justify-content: center; gap: 20px;
-    padding: 10px 24px;
-    border-top: 1px solid var(--border);
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
+    padding: 10px 24px; border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
   }
   .btn {
     font-family: 'Courier Prime', monospace; font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
@@ -98,86 +67,86 @@
   .btn:hover { background: var(--accent); color: #000; }
   .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { background: #f5d86e; }
-  .feedback-msg {
-    font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px;
-    min-width: 240px; text-align: center; transition: opacity 0.3s;
-  }
-  .overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.85);
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
-  }
+  .feedback-msg { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; min-width: 240px; text-align: center; transition: opacity 0.3s; }
+  #canvas-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; display: none; }
+
+  /* ── OVERLAYS ── */
+  .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
   .overlay.hidden { display: none; }
-  .modal {
-    border: 1px solid var(--border); background: #111;
-    padding: 48px 56px; text-align: center; max-width: 480px; width: 90%; position: relative;
-  }
-  .modal::before {
-    content: ''; position: absolute; inset: -1px;
-    background: linear-gradient(135deg, var(--accent) 0%, transparent 40%, transparent 60%, var(--accent2) 100%);
-    z-index: -1;
-  }
+  .modal { border: 1px solid var(--border); background: #111; padding: 48px 56px; text-align: center; max-width: 520px; width: 92%; position: relative; }
+  .modal::before { content: ''; position: absolute; inset: -1px; background: linear-gradient(135deg, var(--accent) 0%, transparent 40%, transparent 60%, var(--accent2) 100%); z-index: -1; }
   .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 6px; color: var(--accent); margin-bottom: 8px; }
   .modal p { color: var(--dim); font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
   .scoring-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
   .scoring-item { border: 1px solid var(--border); padding: 12px; text-align: center; }
-  .scoring-pts { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--accent); line-height: 1; }
+  .scoring-pts { font-family: 'Bebas Neue', sans-serif; font-size: 32px; line-height: 1; }
   .scoring-desc { font-size: 11px; color: var(--dim); letter-spacing: 1px; margin-top: 4px; }
   .final-score { font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: var(--accent); line-height: 1; margin: 8px 0; }
   .final-rounds { color: var(--dim); font-size: 13px; letter-spacing: 2px; margin-bottom: 28px; }
 
-  /* Mobile responsive */
+  /* ── MENU ── */
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .menu-card {
+    border: 1px solid var(--border); padding: 24px 16px; text-align: center; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s; position: relative; overflow: hidden;
+  }
+  .menu-card:hover { border-color: var(--accent); background: rgba(232,197,71,0.05); }
+  .menu-card-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; color: var(--accent); }
+  .menu-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--text); margin: 4px 0 8px; }
+  .menu-card-desc { font-size: 11px; color: var(--dim); line-height: 1.6; }
+  .menu-card-2 .menu-card-num { color: var(--accent3); }
+  .menu-card-2:hover { border-color: var(--accent3); background: rgba(192,132,252,0.05); }
+
+  /* Mobile */
   @media (max-width: 600px) {
     header { padding: 8px 12px; flex-wrap: wrap; gap: 8px; }
     .title { font-size: 22px; }
     .score-bar { gap: 16px; }
     .score-value { font-size: 22px; }
     .progress-bar-wrap { width: 120px; }
-    .modal { padding: 32px 24px; }
+    .modal { padding: 32px 20px; }
     .modal h2 { font-size: 36px; }
     .final-score { font-size: 60px; }
+    .menu-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="title">ANGLE MATCH</div>
-  <div class="score-bar">
+  <div class="title" id="header-title" onclick="showMenu()">ANGLE MATCH</div>
+  <div class="score-bar" id="score-bar-wrap" style="display:none">
     <div class="score-block">
       <div class="score-label">Round</div>
       <div class="score-value" id="round-num">1</div>
     </div>
     <div class="progress-bar-wrap">
-      <div class="score-label" style="font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;">Score</div>
+      <div class="score-label">Score</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
         <div class="score-value" id="score-display" style="font-size:24px;">0</div>
-        <div class="progress-bar-bg" style="flex:1">
-          <div class="progress-bar-fill" id="score-bar" style="width:0%"></div>
-        </div>
+        <div class="progress-bar-bg" style="flex:1"><div class="progress-bar-fill" id="score-bar" style="width:0%"></div></div>
         <div style="font-family:'Bebas Neue';font-size:14px;color:var(--dim)">20</div>
       </div>
     </div>
     <div class="score-block">
-      <div class="score-label">Target</div>
+      <div class="score-label" id="target-label">Target</div>
       <div class="score-value" id="target-display">—°</div>
     </div>
   </div>
 </header>
 
-<div class="main">
+<div class="main" id="main-area">
   <div class="panel panel-left">
-    <div class="panel-label">Target Angle</div>
+    <div class="panel-label">Target</div>
     <canvas id="canvas-left"></canvas>
   </div>
   <div class="panel" id="panel-right">
-    <div class="panel-label">Your Angle — drag the arm</div>
+    <div class="panel-label" id="right-label">Your Angle — drag the arm</div>
     <canvas id="canvas-right"></canvas>
   </div>
 </div>
 
-<footer>
+<footer id="game-footer" style="display:none">
   <div class="feedback-msg" id="feedback-msg" style="opacity:0">—</div>
   <button class="btn btn-primary" id="submit-btn">SUBMIT</button>
   <button class="btn" id="skip-btn">SKIP</button>
@@ -185,53 +154,80 @@
 
 <canvas id="canvas-overlay"></canvas>
 
-<!-- Start overlay -->
-<div class="overlay" id="overlay-start">
+<!-- ── MENU OVERLAY ── -->
+<div class="overlay" id="overlay-menu">
   <div class="modal">
     <h2>ANGLE MATCH</h2>
-    <p>Drag the arm on the right to match the angle shown on the left.<br>A protractor is provided to guide you.</p>
-    <div class="scoring-grid">
-      <div class="scoring-item">
-        <div class="scoring-pts" style="color:var(--correct)">3 PTS</div>
-        <div class="scoring-desc">Exact match</div>
+    <p>Choose your game mode.</p>
+    <div class="menu-grid">
+      <div class="menu-card" onclick="launchGame(1)">
+        <div class="menu-card-num">1</div>
+        <div class="menu-card-title">Classic</div>
+        <div class="menu-card-desc">One arm. Match the target angle using the protractor.</div>
       </div>
-      <div class="scoring-item">
-        <div class="scoring-pts" style="color:var(--close)">2 PTS</div>
-        <div class="scoring-desc">Within 3°</div>
-      </div>
-      <div class="scoring-item" style="grid-column:1/-1">
-        <div class="scoring-pts" style="color:var(--off)">1 PT</div>
-        <div class="scoring-desc">Within 5°</div>
+      <div class="menu-card menu-card-2" onclick="launchGame(2)">
+        <div class="menu-card-num" style="color:var(--accent3)">2</div>
+        <div class="menu-card-title">Dual Arm</div>
+        <div class="menu-card-desc">Two arms + a fixed 90° center. Match both arms. Both must score to earn points.</div>
       </div>
     </div>
-    <p style="margin-bottom:28px;">First to <strong style="color:var(--accent)">20 points</strong> wins.</p>
-    <button class="btn btn-primary" onclick="startGame()">START GAME</button>
+    <p style="font-size:12px;margin-bottom:0;">First to <strong style="color:var(--accent)">20 points</strong> wins each mode.</p>
   </div>
 </div>
 
-<!-- End overlay -->
+<!-- ── GAME 1 START ── -->
+<div class="overlay hidden" id="overlay-g1-start">
+  <div class="modal">
+    <h2>ANGLE MATCH</h2>
+    <p>Drag the arm on the right to match the angle shown on the left. A protractor guides you.</p>
+    <div class="scoring-grid">
+      <div class="scoring-item"><div class="scoring-pts" style="color:var(--correct)">3 PTS</div><div class="scoring-desc">Exact match</div></div>
+      <div class="scoring-item"><div class="scoring-pts" style="color:var(--accent)">2 PTS</div><div class="scoring-desc">Within 3°</div></div>
+      <div class="scoring-item" style="grid-column:1/-1"><div class="scoring-pts" style="color:var(--off)">1 PT</div><div class="scoring-desc">Within 5°</div></div>
+    </div>
+    <p style="margin-bottom:28px;">First to <strong style="color:var(--accent)">20 points</strong> wins.</p>
+    <button class="btn btn-primary" onclick="g1Start()">START</button>
+    <button class="btn" style="margin-left:8px" onclick="showMenu()">MENU</button>
+  </div>
+</div>
+
+<!-- ── GAME 2 START ── -->
+<div class="overlay hidden" id="overlay-g2-start">
+  <div class="modal" style="max-width:560px">
+    <h2 style="color:var(--accent3)">DUAL ARM</h2>
+    <p>Match <strong style="color:var(--text)">both arms</strong> to the target. A fixed arm sits at 90°. The protractor measures the space between your two movable arms.</p>
+    <div class="scoring-grid">
+      <div class="scoring-item"><div class="scoring-pts" style="color:var(--correct)">3 PTS</div><div class="scoring-desc">Both exact</div></div>
+      <div class="scoring-item"><div class="scoring-pts" style="color:var(--accent)">2 PTS</div><div class="scoring-desc">Both within 3°</div></div>
+      <div class="scoring-item" style="grid-column:1/-1"><div class="scoring-pts" style="color:var(--off)">1 PT</div><div class="scoring-desc">Both within 5°</div></div>
+    </div>
+    <p style="margin-bottom:8px;font-size:12px;color:var(--dim)">Arms start at 45° and 135°. Both arms must meet the threshold — the weaker arm determines your score.</p>
+    <p style="margin-bottom:28px;">First to <strong style="color:var(--accent3)">20 points</strong> wins.</p>
+    <button class="btn btn-primary" style="background:var(--accent3);border-color:var(--accent3);color:#000" onclick="g2Start()">START</button>
+    <button class="btn" style="margin-left:8px" onclick="showMenu()">MENU</button>
+  </div>
+</div>
+
+<!-- ── GAME OVER ── -->
 <div class="overlay hidden" id="overlay-end">
   <div class="modal">
     <h2>GAME OVER</h2>
     <div class="final-score" id="final-score">0</div>
     <div class="final-rounds" id="final-rounds">in 0 rounds</div>
-    <button class="btn btn-primary" onclick="startGame()">PLAY AGAIN</button>
+    <button class="btn btn-primary" id="play-again-btn">PLAY AGAIN</button>
+    <button class="btn" style="margin-left:8px" onclick="showMenu()">MENU</button>
   </div>
 </div>
 
 <script>
-// ─── State ───────────────────────────────────────────────────────────────────
-let targetAngle = 90;
-let playerAngle = 90;
-let score = 0;
-let round = 1;
-let dragging = false;
-let gameActive = false;
-let feedbackTimer = null;
-let revealActive = false;
-let revealAnimId = null;
+// ════════════════════════════════════════════════════════════
+// SHARED GLOBALS
+// ════════════════════════════════════════════════════════════
+let currentGame = 0; // 1 or 2
+let score = 0, round = 1;
+let gameActive = false, revealActive = false;
+let feedbackTimer = null, revealAnimId = null;
 
-// ─── Canvas refs ─────────────────────────────────────────────────────────────
 const canvasL  = document.getElementById('canvas-left');
 const canvasR  = document.getElementById('canvas-right');
 const canvasOv = document.getElementById('canvas-overlay');
@@ -239,454 +235,567 @@ const ctxL  = canvasL.getContext('2d');
 const ctxR  = canvasR.getContext('2d');
 const ctxOv = canvasOv.getContext('2d');
 
+// ── geometry ──────────────────────────────────────────────
+function a2c(deg) { const r = deg*Math.PI/180; return { x: Math.cos(r), y: -Math.sin(r) }; }
+function p2a(cx, cy, px, py) { let d = Math.atan2(-(py-cy), px-cx)*180/Math.PI; return d<0?d+360:d; }
+
+function getPivotScreen(canvasEl) {
+  const rect = canvasEl.getBoundingClientRect();
+  const W=canvasEl.width, H=canvasEl.height;
+  const scaleX=rect.width/W, scaleY=rect.height/H;
+  const cx=W/2, cy=H/2+H*0.07, R=W*0.38;
+  return { x: rect.left+cx*scaleX, y: rect.top+cy*scaleY, R: R*Math.min(scaleX,scaleY) };
+}
+
+function getCanvasPos(e, canvas) {
+  const rect=canvas.getBoundingClientRect();
+  const cx=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const cy=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  return { x: cx*(canvas.width/rect.width), y: cy*(canvas.height/rect.height) };
+}
+
 function resizeCanvases() {
-  const panel = document.getElementById('panel-right');
-  const rect = panel.getBoundingClientRect();
-  const size = Math.min(rect.width - 40, rect.height - 60);
-  const s = Math.max(220, size);
-  canvasL.width = canvasR.width = s;
-  canvasL.height = canvasR.height = s;
-  canvasOv.width  = window.innerWidth;
-  canvasOv.height = window.innerHeight;
-  drawLeft();
-  drawRight();
+  const panel=document.getElementById('panel-right');
+  const rect=panel.getBoundingClientRect();
+  const s=Math.max(220, Math.min(rect.width-40, rect.height-60));
+  canvasL.width=canvasR.width=s;
+  canvasL.height=canvasR.height=s;
+  canvasOv.width=window.innerWidth; canvasOv.height=window.innerHeight;
+  if (currentGame===1) { g1DrawLeft(); g1DrawRight(); }
+  if (currentGame===2) { g2DrawLeft(); g2DrawRight(); }
+}
+window.addEventListener('resize', () => {
+  resizeCanvases();
+  canvasOv.width=window.innerWidth; canvasOv.height=window.innerHeight;
+});
+
+// ── UI helpers ────────────────────────────────────────────
+function updateScoreUI() {
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('round-num').textContent = round;
+  document.getElementById('score-bar').style.width = Math.min(100,(score/20)*100)+'%';
 }
 
-// ─── Geometry helpers ─────────────────────────────────────────────────────────
-function angleToCanvas(deg) {
-  const rad = (deg * Math.PI) / 180;
-  return { x: Math.cos(rad), y: -Math.sin(rad) };
+function showFeedback(text, color) {
+  const el=document.getElementById('feedback-msg');
+  el.textContent=text; el.style.color=color; el.style.opacity='1';
+  clearTimeout(feedbackTimer); feedbackTimer=setTimeout(()=>el.style.opacity='0',3000);
 }
 
-function pointToAngle(cx, cy, px, py) {
-  const dx = px - cx;
-  const dy = -(py - cy);
-  let deg = Math.atan2(dy, dx) * (180 / Math.PI);
-  if (deg < 0) deg += 360;
-  return deg;
+function hideFeedback() { document.getElementById('feedback-msg').style.opacity='0'; }
+
+function hideAllOverlays() {
+  ['overlay-menu','overlay-g1-start','overlay-g2-start','overlay-end'].forEach(id=>{
+    document.getElementById(id).classList.add('hidden');
+  });
 }
 
-// ─── Drawing ─────────────────────────────────────────────────────────────────
-const COLORS = {
-  baseline:   '#888',
-  arm:        '#e8c547',
-  armPlayer:  '#4ec9b0',
-  arcFill:    'rgba(232,197,71,0.08)',
-  arcFillP:   'rgba(78,201,176,0.10)',
-  protractor: 'rgba(255,255,255,0.03)',
-  protTick:   'rgba(255,255,255,0.25)',
-  protLabel:  'rgba(255,255,255,0.55)',
-  pivot:      '#e8c547',
-  pivotP:     '#4ec9b0',
-};
+function clearOv() {
+  ctxOv.clearRect(0,0,canvasOv.width,canvasOv.height);
+  canvasOv.style.display='none';
+}
 
-function drawArm(ctx, cx, cy, R, angle, color, showHandle, handleHighlight) {
-  const dir = angleToCanvas(angle);
-  const tipX = cx + dir.x * R;
-  const tipY = cy + dir.y * R;
-  const perpX = -dir.y, perpY = dir.x;
-  const arrowLen = R * 0.05;
-  const W = ctx.canvas.width;
+function showMenu() {
+  gameActive=false; currentGame=0;
+  if (revealAnimId) { cancelAnimationFrame(revealAnimId); revealAnimId=null; }
+  clearOv();
+  hideAllOverlays();
+  document.getElementById('score-bar-wrap').style.display='none';
+  document.getElementById('game-footer').style.display='none';
+  document.getElementById('overlay-menu').classList.remove('hidden');
+  document.getElementById('header-title').textContent='ANGLE MATCH';
+}
 
-  ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.lineTo(tipX, tipY);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([]);
-  ctx.stroke();
+function endGame() {
+  gameActive=false;
+  if (typeof SFX!=='undefined') SFX.gameOver();
+  document.getElementById('final-score').textContent=score;
+  const r=round-1;
+  document.getElementById('final-rounds').textContent=`in ${r} round${r!==1?'s':''}`;
+  document.getElementById('play-again-btn').onclick = currentGame===1 ? g1Start : g2Start;
+  document.getElementById('overlay-end').classList.remove('hidden');
+}
 
-  ctx.beginPath();
-  ctx.moveTo(tipX, tipY);
-  ctx.lineTo(tipX - dir.x*arrowLen + perpX*arrowLen*0.5, tipY - dir.y*arrowLen + perpY*arrowLen*0.5);
-  ctx.lineTo(tipX - dir.x*arrowLen - perpX*arrowLen*0.5, tipY - dir.y*arrowLen - perpY*arrowLen*0.5);
-  ctx.closePath();
-  ctx.fillStyle = color;
-  ctx.fill();
-
-  if (showHandle) {
-    ctx.beginPath();
-    ctx.arc(tipX, tipY, W * 0.025, 0, Math.PI * 2);
-    ctx.fillStyle = handleHighlight ? '#fff' : color;
-    ctx.fill();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+function launchGame(n) {
+  hideAllOverlays();
+  currentGame=n;
+  score=0; round=1;
+  document.getElementById('score-bar-wrap').style.display='flex';
+  document.getElementById('game-footer').style.display='flex';
+  updateScoreUI();
+  if (n===1) {
+    document.getElementById('header-title').textContent='ANGLE MATCH';
+    document.getElementById('right-label').textContent='Your Angle — drag the arm';
+    document.getElementById('target-label').textContent='Target';
+    resizeCanvases();
+    document.getElementById('overlay-g1-start').classList.remove('hidden');
+  } else {
+    document.getElementById('header-title').textContent='ANGLE MATCH 2';
+    document.getElementById('right-label').textContent='Match both arms';
+    document.getElementById('target-label').textContent='Target';
+    resizeCanvases();
+    document.getElementById('overlay-g2-start').classList.remove('hidden');
   }
 }
 
-function drawAnglePanel(ctx, angle, showProtractor, highlight) {
-  const W = ctx.canvas.width;
-  const H = ctx.canvas.height;
-  const cx = W / 2;
-  const cy = H / 2 + H * 0.07;
-  const R = W * 0.38;
+// ── overlay arm drawing (shared) ──────────────────────────
+function drawOvArm(px, py, R, angle, color, clear=true) {
+  if (clear) ctxOv.clearRect(0,0,canvasOv.width,canvasOv.height);
+  const dir=a2c(angle);
+  const tipX=px+dir.x*R, tipY=py+dir.y*R;
+  const perpX=-dir.y, perpY=dir.x, al=R*0.05;
+  ctxOv.save(); ctxOv.shadowColor=color; ctxOv.shadowBlur=22;
+  ctxOv.beginPath(); ctxOv.moveTo(px,py); ctxOv.lineTo(tipX,tipY);
+  ctxOv.strokeStyle=color; ctxOv.lineWidth=3; ctxOv.setLineDash([]); ctxOv.stroke();
+  ctxOv.beginPath();
+  ctxOv.moveTo(tipX,tipY);
+  ctxOv.lineTo(tipX-dir.x*al+perpX*al*0.5, tipY-dir.y*al+perpY*al*0.5);
+  ctxOv.lineTo(tipX-dir.x*al-perpX*al*0.5, tipY-dir.y*al-perpY*al*0.5);
+  ctxOv.closePath(); ctxOv.fillStyle=color; ctxOv.fill();
+  ctxOv.beginPath(); ctxOv.arc(tipX,tipY,R*0.065,0,Math.PI*2); ctxOv.fillStyle=color; ctxOv.fill();
+  ctxOv.beginPath(); ctxOv.arc(px,py,R*0.037,0,Math.PI*2); ctxOv.fillStyle=color; ctxOv.fill();
+  ctxOv.restore();
+}
 
-  ctx.clearRect(0, 0, W, H);
+// ════════════════════════════════════════════════════════════
+// GAME 1 — CLASSIC
+// ════════════════════════════════════════════════════════════
+let g1Target=90, g1Player=90, g1Dragging=false;
 
-  if (showProtractor) {
+const G1C = {
+  arm:'#e8c547', armP:'#4ec9b0',
+  arcFill:'rgba(232,197,71,0.08)', arcFillP:'rgba(78,201,176,0.10)',
+  protTick:'rgba(255,255,255,0.25)', protLabel:'rgba(255,255,255,0.55)',
+};
+
+function g1DrawArmOnCtx(ctx, cx, cy, R, angle, color, handle, hlHandle) {
+  const W=ctx.canvas.width, dir=a2c(angle);
+  const tipX=cx+dir.x*R, tipY=cy+dir.y*R;
+  const perpX=-dir.y, perpY=dir.x, al=R*0.05;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(tipX,tipY);
+  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.setLineDash([]); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(tipX,tipY);
+  ctx.lineTo(tipX-dir.x*al+perpX*al*0.5, tipY-dir.y*al+perpY*al*0.5);
+  ctx.lineTo(tipX-dir.x*al-perpX*al*0.5, tipY-dir.y*al-perpY*al*0.5);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+  if (handle) {
+    ctx.beginPath(); ctx.arc(tipX,tipY,W*0.025,0,Math.PI*2);
+    ctx.fillStyle=hlHandle?'#fff':color; ctx.fill();
+    ctx.strokeStyle='#000'; ctx.lineWidth=1.5; ctx.stroke();
+  }
+}
+
+function g1DrawPanel(ctx, angle, isPlayer, hl) {
+  const W=ctx.canvas.width, H=ctx.canvas.height;
+  const cx=W/2, cy=H/2+H*0.07, R=W*0.38;
+  ctx.clearRect(0,0,W,H);
+
+  if (isPlayer) {
+    ctx.beginPath(); ctx.arc(cx,cy,R,Math.PI,0,false); ctx.lineTo(cx,cy); ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,0.02)'; ctx.fill();
+    for (let d=0;d<=180;d++) {
+      const ar=d*Math.PI/180, cos=Math.cos(ar), sin=Math.sin(ar);
+      const isMaj=d%10===0, isMid=d%5===0&&!isMaj;
+      const tl=isMaj?R*0.10:isMid?R*0.065:R*0.04;
+      ctx.beginPath(); ctx.moveTo(cx+cos*R,cy-sin*R); ctx.lineTo(cx+cos*(R-tl),cy-sin*(R-tl));
+      ctx.strokeStyle=G1C.protTick; ctx.lineWidth=isMaj?1.5:0.8; ctx.stroke();
+      if (isMaj) {
+        ctx.save(); ctx.translate(cx+cos*(R-tl-R*0.085),cy-sin*(R-tl-R*0.085));
+        ctx.fillStyle=G1C.protLabel; ctx.font=`${W*0.028}px 'Courier Prime',monospace`;
+        ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(d,0,0); ctx.restore();
+      }
+    }
+    ctx.beginPath(); ctx.arc(cx,cy,R,Math.PI,0,false); ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.stroke();
+  }
+
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R*0.55,0,-(angle*Math.PI/180),true); ctx.closePath();
+  ctx.fillStyle=isPlayer?G1C.arcFillP:G1C.arcFill; ctx.fill();
+
+  ctx.beginPath(); ctx.moveTo(cx-R*0.15,cy); ctx.lineTo(cx+R*1.05,cy);
+  ctx.strokeStyle='#888'; ctx.lineWidth=2; ctx.stroke();
+
+  g1DrawArmOnCtx(ctx,cx,cy,R,angle,isPlayer?G1C.armP:G1C.arm,isPlayer,hl);
+
+  ctx.beginPath(); ctx.arc(cx,cy,W*0.014,0,Math.PI*2);
+  ctx.fillStyle=isPlayer?G1C.armP:G1C.arm; ctx.fill();
+
+  if (isPlayer) {
+    const ld=a2c(angle/2);
+    ctx.font=`bold ${W*0.038}px 'Courier Prime',monospace`;
+    ctx.fillStyle='rgba(78,201,176,0.9)'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(Math.round(g1Player)+'°', cx+ld.x*R*0.30, cy+ld.y*R*0.30);
+  }
+}
+
+function g1DrawLeft()  { g1DrawPanel(ctxL, g1Target, false, false); }
+function g1DrawRight(hl=false) { g1DrawPanel(ctxR, g1Player, true, hl); }
+
+function g1NearHandle(px,py) {
+  const W=canvasR.width, H=canvasR.height, cx=W/2, cy=H/2+H*0.07, R=W*0.38;
+  const d=a2c(g1Player);
+  return Math.hypot(px-(cx+d.x*R), py-(cy+d.y*R)) < W*0.07;
+}
+
+// drag listeners
+canvasR.addEventListener('mousedown', e => {
+  if (currentGame!==1||!gameActive||revealActive) return;
+  const p=getCanvasPos(e,canvasR);
+  if (g1NearHandle(p.x,p.y)) { g1Dragging=true; if(typeof SFX!=='undefined') SFX.grab(); }
+});
+canvasR.addEventListener('mousemove', e => {
+  if (currentGame!==1||!gameActive||revealActive) return;
+  const p=getCanvasPos(e,canvasR);
+  if (g1Dragging) {
+    const W=canvasR.width,H=canvasR.height,cx=W/2,cy=H/2+H*0.07;
+    g1Player=Math.max(1,Math.min(179,p2a(cx,cy,p.x,p.y)));
+    g1DrawRight(true);
+    if(typeof SFX!=='undefined'&&Math.abs(g1Player-g1LastTick)>=3){SFX.tick();g1LastTick=g1Player;}
+  } else { canvasR.style.cursor=g1NearHandle(p.x,p.y)?'grab':'crosshair'; }
+});
+canvasR.addEventListener('mouseup',    ()=>{ if(g1Dragging&&typeof SFX!=='undefined')SFX.release(); g1Dragging=false; canvasR.style.cursor='crosshair'; });
+canvasR.addEventListener('mouseleave', ()=>{ g1Dragging=false; });
+canvasR.addEventListener('touchstart', e=>{
+  e.preventDefault(); if(currentGame!==1||!gameActive||revealActive)return;
+  const p=getCanvasPos(e,canvasR); if(g1NearHandle(p.x,p.y)){g1Dragging=true;if(typeof SFX!=='undefined')SFX.grab();}
+},{passive:false});
+canvasR.addEventListener('touchmove', e=>{
+  e.preventDefault(); if(currentGame!==1||!g1Dragging||!gameActive||revealActive)return;
+  const p=getCanvasPos(e,canvasR),W=canvasR.width,H=canvasR.height,cx=W/2,cy=H/2+H*0.07;
+  g1Player=Math.max(1,Math.min(179,p2a(cx,cy,p.x,p.y)));
+  g1DrawRight(true);
+  if(typeof SFX!=='undefined'&&Math.abs(g1Player-g1LastTick)>=3){SFX.tick();g1LastTick=g1Player;}
+},{passive:false});
+canvasR.addEventListener('touchend',()=>{ if(g1Dragging&&typeof SFX!=='undefined')SFX.release(); g1Dragging=false; });
+let g1LastTick=90;
+
+function g1Reveal(pts) {
+  if (revealAnimId) cancelAnimationFrame(revealAnimId);
+  revealActive=true;
+  const fc = pts===3?'#ffffff':pts===2?'#e8c547':pts===1?'#ff8c00':'#e05c5c';
+  canvasOv.width=window.innerWidth; canvasOv.height=window.innerHeight; canvasOv.style.display='block';
+  const src=getPivotScreen(canvasL), dest=getPivotScreen(canvasR);
+  const DUR=1400, HOLD=900; let t0=null;
+  function step(ts) {
+    if(!t0)t0=ts;
+    const t=Math.min((ts-t0)/DUR,1);
+    const e=t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    drawOvArm(src.x+(dest.x-src.x)*e, src.y+(dest.y-src.y)*e, src.R+(dest.R-src.R)*e, g1Target, t>=1?fc:'#e8c547');
+    if(t<1){revealAnimId=requestAnimationFrame(step);}
+    else {
+      if(typeof SFX!=='undefined'){
+        if(pts===3)SFX.perfect(); else if(pts===2)SFX.close(); else if(pts===1)SFX.almost(); else SFX.miss();
+      }
+      setTimeout(()=>{clearOv();revealActive=false;revealAnimId=null; if(score>=20)endGame(); else g1NewRound();},HOLD);
+    }
+  }
+  revealAnimId=requestAnimationFrame(step);
+}
+
+function g1NewRound() {
+  if(typeof SFX!=='undefined') SFX.whoosh();
+  g1Target=Math.floor(Math.random()*178)+1;
+  g1Player=90; g1LastTick=90;
+  document.getElementById('target-display').textContent='—°';
+  g1DrawLeft(); g1DrawRight(); hideFeedback();
+}
+
+function g1Submit() {
+  if(!gameActive||revealActive) return;
+  const diff=Math.abs(Math.round(g1Player)-g1Target);
+  let pts, msg, color;
+  if(diff===0){pts=3;msg='PERFECT! +3';color='#ffffff';}
+  else if(diff<=3){pts=2;msg=`CLOSE! ${diff}° off  +2`;color='#e8c547';}
+  else if(diff<=5){pts=1;msg=`ALMOST! ${diff}° off  +1`;color='#ff8c00';}
+  else{pts=0;msg=`${diff}° off — no points`;color='#e05c5c';}
+  if(typeof SFX!=='undefined') SFX.submit();
+  document.getElementById('target-display').textContent=g1Target+'°';
+  score+=pts; round++; updateScoreUI(); showFeedback(msg,color); g1Reveal(pts);
+}
+
+function g1Skip() {
+  if(!gameActive||revealActive) return;
+  if(typeof SFX!=='undefined') SFX.skip();
+  document.getElementById('target-display').textContent=g1Target+'°';
+  showFeedback('SKIPPED — '+g1Target+'°','#555');
+  round++; updateScoreUI(); g1Reveal(0);
+}
+
+function g1Start() {
+  hideAllOverlays(); score=0; round=1; gameActive=true; revealActive=false;
+  if(revealAnimId){cancelAnimationFrame(revealAnimId);revealAnimId=null;} clearOv();
+  if(typeof SFX!=='undefined') SFX.start();
+  updateScoreUI(); g1NewRound();
+}
+
+// ════════════════════════════════════════════════════════════
+// GAME 2 — DUAL ARM
+// ════════════════════════════════════════════════════════════
+// Target: two angles (angleA < 90, angleB > 90)
+// Fixed arm always at 90°
+// Player arms start at 45 and 135
+// Protractor spans between the two player arms, measuring from the right arm (lower angle = "0")
+
+let g2TargetA=45, g2TargetB=135; // target angles for the two arms
+let g2PlayerA=45, g2PlayerB=135; // player's arms
+let g2Dragging=null; // 'A', 'B', or null
+
+const G2C = {
+  fixed:    '#888',         // fixed 90° arm
+  armA:     '#e8c547',      // amber — right arm (lower angle)
+  armB:     '#c084fc',      // purple — left arm (higher angle)
+  armAP:    '#fbbf24',
+  armBP:    '#d946ef',
+  arcFill:  'rgba(192,132,252,0.07)',
+  protTick: 'rgba(255,255,255,0.22)',
+  protLabel:'rgba(255,255,255,0.50)',
+};
+
+function g2DrawArmRaw(ctx, cx, cy, R, angle, color, handle, hl) {
+  const W=ctx.canvas.width, dir=a2c(angle);
+  const tipX=cx+dir.x*R, tipY=cy+dir.y*R;
+  const perpX=-dir.y, perpY=dir.x, al=R*0.05;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(tipX,tipY);
+  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.setLineDash([]); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(tipX,tipY);
+  ctx.lineTo(tipX-dir.x*al+perpX*al*0.5, tipY-dir.y*al+perpY*al*0.5);
+  ctx.lineTo(tipX-dir.x*al-perpX*al*0.5, tipY-dir.y*al-perpY*al*0.5);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+  if (handle) {
+    ctx.beginPath(); ctx.arc(tipX,tipY,W*0.025,0,Math.PI*2);
+    ctx.fillStyle=hl?'#fff':color; ctx.fill();
+    ctx.strokeStyle='#000'; ctx.lineWidth=1.5; ctx.stroke();
+  }
+}
+
+function g2DrawPanel(ctx, angA, angB, isPlayer, hlA, hlB) {
+  // angA = right arm (lower angle, closer to 0°)
+  // angB = left arm (higher angle, closer to 180°)
+  const W=ctx.canvas.width, H=ctx.canvas.height;
+  const cx=W/2, cy=H/2+H*0.07, R=W*0.38;
+  ctx.clearRect(0,0,W,H);
+
+  // Protractor arc between the two arms (spans from angA to angB)
+  // The arc goes CCW from angA to angB (since angA < angB in standard math coords = both above baseline)
+  const spanDeg = angB - angA; // degrees between the arms
+
+  if (isPlayer) {
+    // Protractor wedge: fill the sector between the two arms
     ctx.beginPath();
-    ctx.arc(cx, cy, R, Math.PI, 0, false);
-    ctx.lineTo(cx, cy);
+    ctx.moveTo(cx,cy);
+    // In canvas coords: angle 0 = right, angles measured CW. Our a2c does: x=cos, y=-sin → so angle=0 is right, angle=90 is up.
+    // arc params: startAngle and endAngle in canvas radians (CW from east)
+    // a2c(angA) → canvas angle = -angA * PI/180 (since y is flipped)
+    const startRad = -angA*Math.PI/180;
+    const endRad   = -angB*Math.PI/180;
+    ctx.arc(cx,cy,R,startRad,endRad,true); // true = CCW in canvas = going from angA up to angB
     ctx.closePath();
-    ctx.fillStyle = COLORS.protractor;
-    ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.015)'; ctx.fill();
 
-    for (let d = 0; d <= 180; d++) {
-      const arcRad = (d * Math.PI) / 180;
-      const cos = Math.cos(arcRad);
-      const sin = Math.sin(arcRad);
-      const isMajor = d % 10 === 0;
-      const isMid   = d % 5 === 0 && !isMajor;
-      const tickLen = isMajor ? R * 0.10 : isMid ? R * 0.065 : R * 0.04;
-
-      const x1 = cx + cos * R,           y1 = cy - sin * R;
-      const x2 = cx + cos * (R-tickLen), y2 = cy - sin * (R-tickLen);
-
+    // Tick marks: draw spanDeg ticks, starting from angA (=0 on protractor) to angB (=spanDeg)
+    const steps = Math.ceil(spanDeg);
+    for (let i=0; i<=steps; i++) {
+      const fracAngle = angA + i; // actual canvas angle
+      if (fracAngle > angB) break;
+      const isMaj = i%10===0, isMid = i%5===0&&!isMaj;
+      const tl = isMaj?R*0.10:isMid?R*0.065:R*0.04;
+      const cos=Math.cos(fracAngle*Math.PI/180), sin=Math.sin(fracAngle*Math.PI/180);
       ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.strokeStyle = COLORS.protTick;
-      ctx.lineWidth = isMajor ? 1.5 : 0.8;
-      ctx.stroke();
-
-      if (isMajor) {
-        const lx = cx + cos * (R - tickLen - R * 0.085);
-        const ly = cy - sin * (R - tickLen - R * 0.085);
+      ctx.moveTo(cx+cos*R, cy-sin*R);
+      ctx.lineTo(cx+cos*(R-tl), cy-sin*(R-tl));
+      ctx.strokeStyle=G2C.protTick; ctx.lineWidth=isMaj?1.5:0.8; ctx.stroke();
+      if (isMaj && i > 0 && i < steps) {
         ctx.save();
-        ctx.translate(lx, ly);
-        ctx.fillStyle = COLORS.protLabel;
-        ctx.font = `${W * 0.028}px 'Courier Prime', monospace`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(d, 0, 0);
+        ctx.translate(cx+cos*(R-tl-R*0.085), cy-sin*(R-tl-R*0.085));
+        ctx.fillStyle=G2C.protLabel;
+        ctx.font=`${W*0.026}px 'Courier Prime',monospace`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(i, 0, 0);
         ctx.restore();
       }
     }
 
+    // Outer arc rim (between the two arms)
     ctx.beginPath();
-    ctx.arc(cx, cy, R, Math.PI, 0, false);
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.arc(cx,cy,R,-angA*Math.PI/180,-angB*Math.PI/180,true);
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.stroke();
+
+    // Span label in center of arc
+    const midAngle = (angA+angB)/2;
+    const ld=a2c(midAngle);
+    ctx.font=`bold ${W*0.034}px 'Courier Prime',monospace`;
+    ctx.fillStyle='rgba(192,132,252,0.85)'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(Math.round(spanDeg)+'°', cx+ld.x*R*0.52, cy+ld.y*R*0.52);
   }
 
-  ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.arc(cx, cy, R * 0.55, 0, -(angle * Math.PI / 180), true);
-  ctx.closePath();
-  ctx.fillStyle = showProtractor ? COLORS.arcFillP : COLORS.arcFill;
-  ctx.fill();
+  // Baseline
+  ctx.beginPath(); ctx.moveTo(cx-R*0.15,cy); ctx.lineTo(cx+R*1.05,cy);
+  ctx.strokeStyle='#555'; ctx.lineWidth=1.5; ctx.stroke();
 
-  const baseLen = R * 1.05;
-  ctx.beginPath();
-  ctx.moveTo(cx - baseLen * 0.15, cy);
-  ctx.lineTo(cx + baseLen, cy);
-  ctx.strokeStyle = COLORS.baseline;
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // Fixed arm at 90°
+  g2DrawArmRaw(ctx,cx,cy,R*0.85,90, G2C.fixed, false, false);
 
-  const armColor = showProtractor ? COLORS.armPlayer : COLORS.arm;
-  drawArm(ctx, cx, cy, R, angle, armColor, showProtractor, highlight);
+  // Arm A (right / amber)
+  const colA = isPlayer ? G2C.armAP : G2C.armA;
+  g2DrawArmRaw(ctx,cx,cy,R, angA, colA, isPlayer, hlA);
 
-  ctx.beginPath();
-  ctx.arc(cx, cy, W * 0.014, 0, Math.PI * 2);
-  ctx.fillStyle = showProtractor ? COLORS.pivotP : COLORS.pivot;
-  ctx.fill();
+  // Arm B (left / purple)
+  const colB = isPlayer ? G2C.armBP : G2C.armB;
+  g2DrawArmRaw(ctx,cx,cy,R, angB, colB, isPlayer, hlB);
 
-  if (showProtractor) {
-    const labelDir = angleToCanvas(angle / 2);
-    ctx.font = `bold ${W * 0.038}px 'Courier Prime', monospace`;
-    ctx.fillStyle = 'rgba(78,201,176,0.9)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(Math.round(playerAngle) + '°', cx + labelDir.x * R * 0.30, cy + labelDir.y * R * 0.30);
-  }
+  // Pivot
+  ctx.beginPath(); ctx.arc(cx,cy,W*0.016,0,Math.PI*2);
+  ctx.fillStyle='#ccc'; ctx.fill();
 }
 
-function drawLeft()  { drawAnglePanel(ctxL, targetAngle, false, false); }
-function drawRight(highlight = false) { drawAnglePanel(ctxR, playerAngle, true, highlight); }
+function g2DrawLeft()  { g2DrawPanel(ctxL, g2TargetA, g2TargetB, false, false, false); }
+function g2DrawRight(hlA=false, hlB=false) { g2DrawPanel(ctxR, g2PlayerA, g2PlayerB, true, hlA, hlB); }
 
-// ─── Overlay arm animation ────────────────────────────────────────────────────
-function getPivotScreen(canvasEl) {
-  const rect = canvasEl.getBoundingClientRect();
-  const W = canvasEl.width, H = canvasEl.height;
-  const scaleX = rect.width / W;
-  const scaleY = rect.height / H;
-  const cx = W / 2, cy = H / 2 + H * 0.07, R = W * 0.38;
-  return {
-    x: rect.left + cx * scaleX,
-    y: rect.top  + cy * scaleY,
-    R: R * Math.min(scaleX, scaleY)
-  };
+function g2NearArm(px, py, angle) {
+  const W=canvasR.width, H=canvasR.height, cx=W/2, cy=H/2+H*0.07, R=W*0.38;
+  const d=a2c(angle);
+  return Math.hypot(px-(cx+d.x*R), py-(cy+d.y*R)) < W*0.07;
 }
 
-function drawOverlayArm(px, py, R, angle, color) {
-  ctxOv.clearRect(0, 0, canvasOv.width, canvasOv.height);
-  const dir = angleToCanvas(angle);
-  const tipX = px + dir.x * R;
-  const tipY = py + dir.y * R;
-  const perpX = -dir.y, perpY = dir.x;
-  const arrowLen = R * 0.05;
-
-  ctxOv.save();
-  ctxOv.shadowColor = color;
-  ctxOv.shadowBlur = 22;
-
-  ctxOv.beginPath();
-  ctxOv.moveTo(px, py);
-  ctxOv.lineTo(tipX, tipY);
-  ctxOv.strokeStyle = color;
-  ctxOv.lineWidth = 3;
-  ctxOv.setLineDash([]);
-  ctxOv.stroke();
-
-  ctxOv.beginPath();
-  ctxOv.moveTo(tipX, tipY);
-  ctxOv.lineTo(tipX - dir.x*arrowLen + perpX*arrowLen*0.5, tipY - dir.y*arrowLen + perpY*arrowLen*0.5);
-  ctxOv.lineTo(tipX - dir.x*arrowLen - perpX*arrowLen*0.5, tipY - dir.y*arrowLen - perpY*arrowLen*0.5);
-  ctxOv.closePath();
-  ctxOv.fillStyle = color;
-  ctxOv.fill();
-
-  ctxOv.beginPath();
-  ctxOv.arc(tipX, tipY, R * 0.065, 0, Math.PI * 2);
-  ctxOv.fillStyle = color;
-  ctxOv.fill();
-
-  ctxOv.beginPath();
-  ctxOv.arc(px, py, R * 0.037, 0, Math.PI * 2);
-  ctxOv.fillStyle = color;
-  ctxOv.fill();
-
-  ctxOv.restore();
-}
-
-function clearOverlay() {
-  ctxOv.clearRect(0, 0, canvasOv.width, canvasOv.height);
-  canvasOv.style.display = 'none';
-}
-
-// ─── Reveal animation ─────────────────────────────────────────────────────────
-function startReveal(pts) {
-  if (revealAnimId) cancelAnimationFrame(revealAnimId);
-  revealActive = true;
-
-  let finalColor;
-  if      (pts === 3) finalColor = '#ffffff';
-  else if (pts === 2) finalColor = '#e8c547';
-  else if (pts === 1) finalColor = '#ff8c00';
-  else                finalColor = '#e05c5c';
-
-  const travelColor = COLORS.arm;
-
-  canvasOv.width  = window.innerWidth;
-  canvasOv.height = window.innerHeight;
-  canvasOv.style.display = 'block';
-
-  const src  = getPivotScreen(canvasL);
-  const dest = getPivotScreen(canvasR);
-
-  const DURATION = 1400;
-  const HOLD     = 900;
-  let startTime  = null;
-
-  function step(ts) {
-    if (!startTime) startTime = ts;
-    const t = Math.min((ts - startTime) / DURATION, 1);
-    const ease = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
-
-    const px = src.x + (dest.x - src.x) * ease;
-    const py = src.y + (dest.y - src.y) * ease;
-    const R  = src.R + (dest.R - src.R) * ease;
-
-    const color = t >= 1 ? finalColor : travelColor;
-    drawOverlayArm(px, py, R, targetAngle, color);
-
-    if (t < 1) {
-      revealAnimId = requestAnimationFrame(step);
-    } else {
-      drawOverlayArm(dest.x, dest.y, dest.R, targetAngle, finalColor);
-      setTimeout(() => {
-        clearOverlay();
-        revealActive = false;
-        revealAnimId = null;
-        if (score >= 20) endGame();
-        else newRound();
-      }, HOLD);
-    }
-  }
-  revealAnimId = requestAnimationFrame(step);
-}
-
-// ─── Dragging ─────────────────────────────────────────────────────────────────
-function getCanvasPos(e, canvas) {
-  const rect = canvas.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
-}
-
-function getCenterAndRadius() {
-  const W = canvasR.width, H = canvasR.height;
-  return { cx: W/2, cy: H/2 + H*0.07, R: W*0.38 };
-}
-
-function isNearHandle(px, py) {
-  const { cx, cy, R } = getCenterAndRadius();
-  const dir = angleToCanvas(playerAngle);
-  return Math.hypot(px - (cx + dir.x*R), py - (cy + dir.y*R)) < canvasR.width * 0.07;
-}
+let g2LastTickA=45, g2LastTickB=135;
 
 canvasR.addEventListener('mousedown', e => {
-  if (!gameActive || revealActive) return;
-  if (isNearHandle(...Object.values(getCanvasPos(e, canvasR)))) dragging = true;
+  if (currentGame!==2||!gameActive||revealActive) return;
+  const p=getCanvasPos(e,canvasR);
+  if (g2NearArm(p.x,p.y,g2PlayerA)) { g2Dragging='A'; if(typeof SFX!=='undefined')SFX.grab(); }
+  else if (g2NearArm(p.x,p.y,g2PlayerB)) { g2Dragging='B'; if(typeof SFX!=='undefined')SFX.grab(); }
 });
 
 canvasR.addEventListener('mousemove', e => {
-  if (!gameActive || revealActive) return;
-  const pos = getCanvasPos(e, canvasR);
-  if (dragging) {
-    const { cx, cy } = getCenterAndRadius();
-    let deg = pointToAngle(cx, cy, pos.x, pos.y);
-    playerAngle = Math.max(1, Math.min(179, deg));
-    drawRight(true);
+  if (currentGame!==2||!gameActive||revealActive) return;
+  const p=getCanvasPos(e,canvasR);
+  if (g2Dragging) {
+    const W=canvasR.width, H=canvasR.height, cx=W/2, cy=H/2+H*0.07;
+    let deg = p2a(cx,cy,p.x,p.y);
+    if (g2Dragging==='A') {
+      g2PlayerA = Math.max(1, Math.min(89, deg));
+      if(typeof SFX!=='undefined'&&Math.abs(g2PlayerA-g2LastTickA)>=3){SFX.tick();g2LastTickA=g2PlayerA;}
+    } else {
+      g2PlayerB = Math.max(91, Math.min(179, deg));
+      if(typeof SFX!=='undefined'&&Math.abs(g2PlayerB-g2LastTickB)>=3){SFX.tick();g2LastTickB=g2PlayerB;}
+    }
+    g2DrawRight(g2Dragging==='A', g2Dragging==='B');
   } else {
-    canvasR.style.cursor = isNearHandle(pos.x, pos.y) ? 'grab' : 'crosshair';
+    const nearA=g2NearArm(p.x,p.y,g2PlayerA), nearB=g2NearArm(p.x,p.y,g2PlayerB);
+    canvasR.style.cursor=(nearA||nearB)?'grab':'crosshair';
   }
 });
 
-canvasR.addEventListener('mouseup',    () => { dragging = false; canvasR.style.cursor = 'crosshair'; });
-canvasR.addEventListener('mouseleave', () => { dragging = false; });
+canvasR.addEventListener('mouseup', ()=>{ if(g2Dragging&&typeof SFX!=='undefined')SFX.release(); g2Dragging=null; canvasR.style.cursor='crosshair'; });
+canvasR.addEventListener('mouseleave', ()=>{ g2Dragging=null; });
 
-canvasR.addEventListener('touchstart', e => {
-  e.preventDefault();
-  if (!gameActive || revealActive) return;
-  const pos = getCanvasPos(e, canvasR);
-  if (isNearHandle(pos.x, pos.y)) dragging = true;
-}, { passive: false });
+canvasR.addEventListener('touchstart', e=>{
+  e.preventDefault(); if(currentGame!==2||!gameActive||revealActive) return;
+  const p=getCanvasPos(e,canvasR);
+  if(g2NearArm(p.x,p.y,g2PlayerA)){g2Dragging='A';if(typeof SFX!=='undefined')SFX.grab();}
+  else if(g2NearArm(p.x,p.y,g2PlayerB)){g2Dragging='B';if(typeof SFX!=='undefined')SFX.grab();}
+},{passive:false});
 
-canvasR.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (!dragging || !gameActive || revealActive) return;
-  const pos = getCanvasPos(e, canvasR);
-  const { cx, cy } = getCenterAndRadius();
-  playerAngle = Math.max(1, Math.min(179, pointToAngle(cx, cy, pos.x, pos.y)));
-  drawRight(true);
-}, { passive: false });
+canvasR.addEventListener('touchmove', e=>{
+  e.preventDefault(); if(currentGame!==2||!g2Dragging||!gameActive||revealActive)return;
+  const p=getCanvasPos(e,canvasR),W=canvasR.width,H=canvasR.height,cx=W/2,cy=H/2+H*0.07;
+  let deg=p2a(cx,cy,p.x,p.y);
+  if(g2Dragging==='A'){
+    g2PlayerA=Math.max(1,Math.min(89,deg));
+    if(typeof SFX!=='undefined'&&Math.abs(g2PlayerA-g2LastTickA)>=3){SFX.tick();g2LastTickA=g2PlayerA;}
+  } else {
+    g2PlayerB=Math.max(91,Math.min(179,deg));
+    if(typeof SFX!=='undefined'&&Math.abs(g2PlayerB-g2LastTickB)>=3){SFX.tick();g2LastTickB=g2PlayerB;}
+  }
+  g2DrawRight(g2Dragging==='A',g2Dragging==='B');
+},{passive:false});
+canvasR.addEventListener('touchend',()=>{ if(g2Dragging&&typeof SFX!=='undefined')SFX.release(); g2Dragging=null; });
 
-canvasR.addEventListener('touchend', () => { dragging = false; });
-
-// ─── Game logic ───────────────────────────────────────────────────────────────
-function newRound() {
-  targetAngle = Math.floor(Math.random() * 178) + 1;
-  playerAngle = 90;
-  drawLeft();
-  drawRight();
-  document.getElementById('target-display').textContent = '—°';
-  hideFeedback();
+function g2Reveal(pts) {
+  if (revealAnimId) cancelAnimationFrame(revealAnimId);
+  revealActive=true;
+  const fc=pts===3?'#ffffff':pts===2?'#e8c547':pts===1?'#ff8c00':'#e05c5c';
+  canvasOv.width=window.innerWidth; canvasOv.height=window.innerHeight; canvasOv.style.display='block';
+  const src=getPivotScreen(canvasL), dest=getPivotScreen(canvasR);
+  const DUR=1400, HOLD=900; let t0=null;
+  function step(ts) {
+    if(!t0)t0=ts;
+    const t=Math.min((ts-t0)/DUR,1);
+    const ease=t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    const px=src.x+(dest.x-src.x)*ease, py=src.y+(dest.y-src.y)*ease, R=src.R+(dest.R-src.R)*ease;
+    const col=t>=1?fc:'#e8c547';
+    // Draw both target arms on overlay
+    ctxOv.clearRect(0,0,canvasOv.width,canvasOv.height);
+    drawOvArm(px,py,R,g2TargetA,col,false);
+    drawOvArm(px,py,R,g2TargetB,col,false);
+    if(t<1){revealAnimId=requestAnimationFrame(step);}
+    else {
+      if(typeof SFX!=='undefined'){
+        if(pts===3)SFX.perfect(); else if(pts===2)SFX.close(); else if(pts===1)SFX.almost(); else SFX.miss();
+      }
+      setTimeout(()=>{clearOv();revealActive=false;revealAnimId=null; if(score>=20)endGame(); else g2NewRound();},HOLD);
+    }
+  }
+  revealAnimId=requestAnimationFrame(step);
 }
 
-function showFeedback(text, color) {
-  const el = document.getElementById('feedback-msg');
-  el.textContent = text;
-  el.style.color = color;
-  el.style.opacity = '1';
-  clearTimeout(feedbackTimer);
-  feedbackTimer = setTimeout(hideFeedback, 3000);
+function g2NewRound() {
+  if(typeof SFX!=='undefined') SFX.whoosh();
+  // Generate two target angles: A strictly < 90, B strictly > 90, min span 20°
+  let a, b;
+  do {
+    a = Math.floor(Math.random()*79)+5;  // 5–83
+    b = Math.floor(Math.random()*79)+96; // 96–174
+  } while ((b-a) < 20);
+  g2TargetA=a; g2TargetB=b;
+  g2PlayerA=45; g2PlayerB=135;
+  g2LastTickA=45; g2LastTickB=135;
+  document.getElementById('target-display').textContent='—°';
+  g2DrawLeft(); g2DrawRight(); hideFeedback();
 }
 
-function hideFeedback() {
-  document.getElementById('feedback-msg').style.opacity = '0';
-}
-
-function submitAnswer() {
-  if (!gameActive || revealActive) return;
-  const diff = Math.abs(Math.round(playerAngle) - targetAngle);
+function g2Submit() {
+  if(!gameActive||revealActive) return;
+  const diffA=Math.abs(Math.round(g2PlayerA)-g2TargetA);
+  const diffB=Math.abs(Math.round(g2PlayerB)-g2TargetB);
+  const worstDiff=Math.max(diffA,diffB); // both must qualify
   let pts, msg, color;
-
-  if      (diff === 0) { pts = 3; msg = `PERFECT! +3`;               color = '#ffffff'; }
-  else if (diff <= 3)  { pts = 2; msg = `CLOSE! ${diff}° off  +2`;  color = '#e8c547'; }
-  else if (diff <= 5)  { pts = 1; msg = `ALMOST! ${diff}° off  +1`; color = '#ff8c00'; }
-  else                 { pts = 0; msg = `${diff}° off — no points`;  color = '#e05c5c'; }
-
-  if (typeof SFX !== 'undefined') {
-    SFX.submit();
-    setTimeout(() => {
-      if      (pts === 3) SFX.perfect();
-      else if (pts === 2) SFX.close();
-      else if (pts === 1) SFX.almost();
-      else                SFX.miss();
-    }, 1400);
-  }
-
-  document.getElementById('target-display').textContent = targetAngle + '°';
-  score += pts;
-  round++;
-  updateScoreUI();
-  showFeedback(msg, color);
-  startReveal(pts);
+  if(worstDiff===0){pts=3;msg='PERFECT! +3';color='#ffffff';}
+  else if(worstDiff<=3){pts=2;msg=`CLOSE! ${worstDiff}° off  +2`;color='#e8c547';}
+  else if(worstDiff<=5){pts=1;msg=`ALMOST! ${worstDiff}° off  +1`;color='#ff8c00';}
+  else{pts=0;msg=`${worstDiff}° off — no points`;color='#e05c5c';}
+  if(typeof SFX!=='undefined') SFX.submit();
+  document.getElementById('target-display').textContent=g2TargetA+'° / '+g2TargetB+'°';
+  score+=pts; round++; updateScoreUI(); showFeedback(msg,color); g2Reveal(pts);
 }
 
-function skipRound() {
-  if (!gameActive || revealActive) return;
-  if (typeof SFX !== 'undefined') SFX.skip();
-  document.getElementById('target-display').textContent = targetAngle + '°';
-  showFeedback('SKIPPED — ' + targetAngle + '°', 'var(--dim)');
-  round++;
-  updateScoreUI();
-  startReveal(0);
+function g2Skip() {
+  if(!gameActive||revealActive) return;
+  if(typeof SFX!=='undefined') SFX.skip();
+  document.getElementById('target-display').textContent=g2TargetA+'° / '+g2TargetB+'°';
+  showFeedback('SKIPPED','#555');
+  round++; updateScoreUI(); g2Reveal(0);
 }
 
-function updateScoreUI() {
-  document.getElementById('score-display').textContent = score;
-  document.getElementById('round-num').textContent = round;
-  document.getElementById('score-bar').style.width = Math.min(100, (score/20)*100) + '%';
+function g2Start() {
+  hideAllOverlays(); score=0; round=1; gameActive=true; revealActive=false;
+  if(revealAnimId){cancelAnimationFrame(revealAnimId);revealAnimId=null;} clearOv();
+  if(typeof SFX!=='undefined') SFX.start();
+  updateScoreUI(); g2NewRound();
 }
 
-function startGame() {
-  score = 0; round = 1; gameActive = true; revealActive = false;
-  if (revealAnimId) { cancelAnimationFrame(revealAnimId); revealAnimId = null; }
-  clearOverlay();
-  document.getElementById('overlay-start').classList.add('hidden');
-  document.getElementById('overlay-end').classList.add('hidden');
-  updateScoreUI();
-  if (typeof SFX !== 'undefined') SFX.start();
-  newRound();
-}
-
-function endGame() {
-  gameActive = false;
-  if (typeof SFX !== 'undefined') SFX.gameOver();
-  document.getElementById('final-score').textContent = score;
-  document.getElementById('final-rounds').textContent = `in ${round-1} round${round-1!==1?'s':''}`;
-  document.getElementById('overlay-end').classList.remove('hidden');
-}
-
-function newRound() {
-  if (typeof SFX !== 'undefined') SFX.whoosh();
-  targetAngle = Math.floor(Math.random() * 178) + 1;
-  playerAngle = 90;
-  drawLeft();
-  drawRight();
-  document.getElementById('target-display').textContent = '—°';
-  hideFeedback();
-}
-
-document.getElementById('submit-btn').addEventListener('click', submitAnswer);
-document.getElementById('skip-btn').addEventListener('click', skipRound);
-
-window.addEventListener('resize', () => {
-  resizeCanvases();
-  canvasOv.width  = window.innerWidth;
-  canvasOv.height = window.innerHeight;
+// ── button wiring (checks currentGame) ───────────────────
+document.getElementById('submit-btn').addEventListener('click', ()=>{
+  if(currentGame===1) g1Submit(); else if(currentGame===2) g2Submit();
+});
+document.getElementById('skip-btn').addEventListener('click', ()=>{
+  if(currentGame===1) g1Skip(); else if(currentGame===2) g2Skip();
 });
 
-resizeCanvases();
-
-// ─── Sound Engine (Web Audio API — no external files) ─────────────────────────
+// ════════════════════════════════════════════════════════════
+// SOUND ENGINE
+// ════════════════════════════════════════════════════════════
 const SFX = (() => {
   let ctx = null;
 
@@ -696,7 +805,6 @@ const SFX = (() => {
     return ctx;
   }
 
-  // Utility: create gain node
   function gain(ac, val, when, decay) {
     const g = ac.createGain();
     g.gain.setValueAtTime(val, when);
@@ -704,216 +812,128 @@ const SFX = (() => {
     return g;
   }
 
-  // Utility: oscillator burst
   function osc(ac, type, freq, start, dur, dest) {
     const o = ac.createOscillator();
-    o.type = type;
-    o.frequency.setValueAtTime(freq, start);
-    o.connect(dest);
-    o.start(start);
-    o.stop(start + dur);
+    o.type = type; o.frequency.setValueAtTime(freq, start);
+    o.connect(dest); o.start(start); o.stop(start + dur);
   }
 
-  // Utility: frequency ramp
   function oscRamp(ac, type, f0, f1, start, dur, dest) {
     const o = ac.createOscillator();
-    o.type = type;
-    o.frequency.setValueAtTime(f0, start);
+    o.type = type; o.frequency.setValueAtTime(f0, start);
     o.frequency.exponentialRampToValueAtTime(f1, start + dur);
-    o.connect(dest);
-    o.start(start);
-    o.stop(start + dur);
+    o.connect(dest); o.start(start); o.stop(start + dur);
   }
 
-  // ── Drag tick: subtle click while moving the arm ──
   async function tick() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.06, now, 0.03);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.06, now, 0.03); g.connect(ac.destination);
     const buf = ac.createBuffer(1, ac.sampleRate * 0.02, ac.sampleRate);
     const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i/data.length, 3);
-    const src = ac.createBufferSource();
-    src.buffer = buf;
-    src.connect(g);
-    src.start(now);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random()*2-1)*Math.pow(1-i/data.length,3);
+    const src = ac.createBufferSource(); src.buffer = buf; src.connect(g); src.start(now);
   }
 
-  // ── Grab: low thunk when user clicks the handle ──
   async function grab() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.18, now, 0.08);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.18, now, 0.08); g.connect(ac.destination);
     oscRamp(ac, 'sine', 180, 60, now, 0.08, g);
   }
 
-  // ── Release: soft click on mouseup ──
   async function release() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.10, now, 0.06);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.10, now, 0.06); g.connect(ac.destination);
     oscRamp(ac, 'sine', 120, 80, now, 0.06, g);
   }
 
-  // ── Submit: rising chime ──
   async function submit() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.22, now, 0.18);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.22, now, 0.18); g.connect(ac.destination);
     oscRamp(ac, 'sine', 320, 480, now, 0.12, g);
   }
 
-  // ── Perfect (3 pts): bright tri-tone chord ──
   async function perfect() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
+    const ac = await getCtx(); const now = ac.currentTime;
     [523.25, 659.25, 783.99].forEach((freq, i) => {
-      const g = gain(ac, 0.18, now + i * 0.06, 0.5);
-      g.connect(ac.destination);
-      osc(ac, 'triangle', freq, now + i * 0.06, 0.55, g);
-      // shimmer overtone
-      const g2 = gain(ac, 0.06, now + i * 0.06, 0.4);
-      g2.connect(ac.destination);
-      osc(ac, 'sine', freq * 2, now + i * 0.06, 0.4, g2);
+      const g = gain(ac, 0.18, now+i*0.06, 0.5); g.connect(ac.destination);
+      osc(ac, 'triangle', freq, now+i*0.06, 0.55, g);
+      const g2 = gain(ac, 0.06, now+i*0.06, 0.4); g2.connect(ac.destination);
+      osc(ac, 'sine', freq*2, now+i*0.06, 0.4, g2);
     });
-    // sparkle noise burst
-    const buf = ac.createBuffer(1, ac.sampleRate * 0.08, ac.sampleRate);
+    const buf = ac.createBuffer(1, ac.sampleRate*0.08, ac.sampleRate);
     const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/data.length);
-    const src = ac.createBufferSource();
-    src.buffer = buf;
-    const gn = gain(ac, 0.07, now, 0.08);
-    const hpf = ac.createBiquadFilter();
-    hpf.type = 'highpass'; hpf.frequency.value = 4000;
-    src.connect(hpf); hpf.connect(gn); gn.connect(ac.destination);
-    src.start(now + 0.12);
+    for (let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*(1-i/data.length);
+    const src=ac.createBufferSource(); src.buffer=buf;
+    const hpf=ac.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=4000;
+    const gn=gain(ac,0.07,now,0.08);
+    src.connect(hpf); hpf.connect(gn); gn.connect(ac.destination); src.start(now+0.12);
   }
 
-  // ── Close (2 pts): warm two-note chime ──
   async function close() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
+    const ac = await getCtx(); const now = ac.currentTime;
     [440, 554.37].forEach((freq, i) => {
-      const g = gain(ac, 0.16, now + i * 0.07, 0.45);
-      g.connect(ac.destination);
-      osc(ac, 'triangle', freq, now + i * 0.07, 0.5, g);
+      const g = gain(ac, 0.16, now+i*0.07, 0.45); g.connect(ac.destination);
+      osc(ac, 'triangle', freq, now+i*0.07, 0.5, g);
     });
   }
 
-  // ── Almost (1 pt): single mid tone with slight bend ──
   async function almost() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.18, now, 0.35);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.18, now, 0.35); g.connect(ac.destination);
     oscRamp(ac, 'triangle', 370, 330, now, 0.3, g);
   }
 
-  // ── Miss (0 pts): descending buzz ──
   async function miss() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.15, now, 0.3);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.15, now, 0.3); g.connect(ac.destination);
     oscRamp(ac, 'sawtooth', 220, 110, now, 0.28, g);
-    const g2 = gain(ac, 0.08, now, 0.25);
-    g2.connect(ac.destination);
+    const g2 = gain(ac, 0.08, now, 0.25); g2.connect(ac.destination);
     oscRamp(ac, 'square', 185, 90, now, 0.25, g2);
   }
 
-  // ── Skip: short neutral blip ──
   async function skip() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const g = gain(ac, 0.10, now, 0.12);
-    g.connect(ac.destination);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const g = gain(ac, 0.10, now, 0.12); g.connect(ac.destination);
     oscRamp(ac, 'sine', 260, 200, now, 0.1, g);
   }
 
-  // ── New round whoosh: arm swipe sound ──
   async function whoosh() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    const buf = ac.createBuffer(1, ac.sampleRate * 0.25, ac.sampleRate);
+    const ac = await getCtx(); const now = ac.currentTime;
+    const buf = ac.createBuffer(1, ac.sampleRate*0.25, ac.sampleRate);
     const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / data.length);
-    const src = ac.createBufferSource();
-    src.buffer = buf;
-    const bpf = ac.createBiquadFilter();
-    bpf.type = 'bandpass';
-    bpf.frequency.setValueAtTime(800, now);
-    bpf.frequency.exponentialRampToValueAtTime(200, now + 0.25);
-    bpf.Q.value = 0.8;
-    const g = gain(ac, 0.12, now, 0.25);
-    src.connect(bpf); bpf.connect(g); g.connect(ac.destination);
-    src.start(now);
+    for (let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/data.length);
+    const src=ac.createBufferSource(); src.buffer=buf;
+    const bpf=ac.createBiquadFilter(); bpf.type='bandpass';
+    bpf.frequency.setValueAtTime(800,now); bpf.frequency.exponentialRampToValueAtTime(200,now+0.25);
+    bpf.Q.value=0.8;
+    const g=gain(ac,0.12,now,0.25);
+    src.connect(bpf); bpf.connect(g); g.connect(ac.destination); src.start(now);
   }
 
-  // ── Game over fanfare ──
   async function gameOver() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
-    // Descending sad phrase
-    const notes = [392, 349.23, 329.63, 261.63];
-    notes.forEach((freq, i) => {
-      const t = now + i * 0.18;
-      const g = gain(ac, 0.14, t, 0.22);
-      g.connect(ac.destination);
-      osc(ac, 'triangle', freq, t, 0.25, g);
+    const ac = await getCtx(); const now = ac.currentTime;
+    [392, 349.23, 329.63, 261.63].forEach((freq, i) => {
+      const t=now+i*0.18;
+      const g=gain(ac,0.14,t,0.22); g.connect(ac.destination);
+      osc(ac,'triangle',freq,t,0.25,g);
     });
   }
 
-  // ── Start game: upbeat beep ──
   async function start() {
-    const ac = await getCtx();
-    const now = ac.currentTime;
+    const ac = await getCtx(); const now = ac.currentTime;
     [330, 440, 523.25].forEach((freq, i) => {
-      const t = now + i * 0.1;
-      const g = gain(ac, 0.15, t, 0.18);
-      g.connect(ac.destination);
-      osc(ac, 'square', freq, t, 0.15, g);
+      const t=now+i*0.1;
+      const g=gain(ac,0.15,t,0.18); g.connect(ac.destination);
+      osc(ac,'square',freq,t,0.15,g);
     });
   }
 
   return { tick, grab, release, submit, perfect, close, almost, miss, skip, whoosh, gameOver, start };
 })();
 
-// ─── Wire drag sounds ─────────────────────────────────────────────────────────
-let lastTickAngle = playerAngle;
-
-canvasR.addEventListener('mousedown', e => {
-  if (!gameActive || revealActive) return;
-  const pos = getCanvasPos(e, canvasR);
-  if (isNearHandle(pos.x, pos.y)) SFX.grab();
-}, true);
-
-canvasR.addEventListener('mouseup', () => { if (dragging) SFX.release(); }, true);
-
-canvasR.addEventListener('touchstart', () => {
-  if (!gameActive || revealActive) return;
-  SFX.grab();
-}, { passive: true, capture: true });
-
-canvasR.addEventListener('touchend', () => { if (dragging) SFX.release(); }, true);
-
-// Tick during drag — fires every ~3° of movement
-canvasR.addEventListener('mousemove', () => {
-  if (dragging && Math.abs(playerAngle - lastTickAngle) >= 3) {
-    SFX.tick();
-    lastTickAngle = playerAngle;
-  }
-});
-
-canvasR.addEventListener('touchmove', () => {
-  if (dragging && Math.abs(playerAngle - lastTickAngle) >= 3) {
-    SFX.tick();
-    lastTickAngle = playerAngle;
-  }
-}, { passive: true });
+// ── Boot ──────────────────────────────────────────────────
+resizeCanvases();
+showMenu();
 </script>
 </body>
 </html>
